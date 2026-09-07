@@ -20,8 +20,14 @@ SECRET_KEY = os.getenv(
     "dev-only-secret-key-change-in-production",
 )
 
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
-
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+# Production security settings
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
@@ -87,11 +93,13 @@ WSGI_APPLICATION = 'cueahub.wsgi.application'
 
 
 # Database
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 
