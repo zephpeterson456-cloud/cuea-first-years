@@ -1,0 +1,705 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CUEA First Years Hub</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}?v=2"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/profile.css' %}?v=1"
+    >
+</head>
+
+
+<body>
+
+<header class="navbar">
+
+    <a href="/" class="logo">
+        🎓 CUEA <span>First Years</span>
+    </a>
+
+
+    <button
+        type="button"
+        class="mobile-menu-button"
+
+        aria-label="Open navigation menu"
+    >
+        ☰
+    </button>
+    <nav>
+
+        <a href="/">Home</a>
+
+        <a href="#memes">
+            😂 Memes
+        </a>
+
+        <a href="#motivation">
+            💭 Motivation
+        </a>
+
+
+        {% if user.is_authenticated %}
+
+            <a href="/post/create/" class="nav-post">
+                ➕ Post
+            </a>
+
+            <a
+                href="{% url 'profile' user.username %}"
+                class="nav-user"
+            >
+
+                {% if user.profile.profile_picture %}
+                    <img
+                        src="{{ user.profile.profile_picture.url }}"
+                        alt="Profile picture"
+                        class="nav-avatar"
+                    >
+                {% else %}
+                    <span class="nav-avatar-placeholder">👤</span>
+                {% endif %}
+
+                <span>{{ user.username }}</span>
+
+            </a>
+
+            <a href="/logout/">
+                Logout
+            </a>
+
+        {% else %}
+
+            <a href="/login/">
+                Login
+            </a>
+
+            <a href="/register/" class="nav-post">
+                Join
+            </a>
+
+        {% endif %}
+
+    </nav>
+
+</header>
+
+
+<main>
+
+
+<section class="hero">
+
+    <div>
+
+        <p class="tag">
+            WELCOME, FIRST YEARS 👋
+        </p>
+
+
+        <h1>
+            Campus life is better
+            <span>together.</span>
+        </h1>
+
+
+        <p class="hero-text">
+            Memes, motivation, campus vibes and everything
+            CUEA first years need in one place.
+        </p>
+
+
+        <div class="hero-buttons">
+
+            <a
+                href="#memes"
+                class="btn primary"
+            >
+                Explore Memes 😂
+            </a>
+
+
+            <a
+                href="#motivation"
+                class="btn secondary"
+            >
+                Get Motivation 💭
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section
+    class="section"
+    id="memes"
+>
+
+    <div class="section-heading">
+
+        <div>
+
+            <p class="small-title">
+                FOR THE VIBES
+            </p>
+
+            <h2>
+                😂 Campus Memes
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="posts">
+
+        {% for post in posts %}
+
+            {% if post.post_type == "MEME" %}
+
+                <article class="post-card">
+
+                    {% if post.image %}
+
+                        <img
+                            src="{{ post.image.url }}"
+                            alt="{{ post.title }}"
+                        >
+
+                    {% endif %}
+
+
+                    <div class="post-author">
+
+                        <a
+                            href="{% url 'profile' post.author.username %}"
+                            class="post-avatar"
+                        >
+                            {% if post.author.profile.profile_picture %}
+                                <img
+                                    src="{{ post.author.profile.profile_picture.url }}"
+                                    alt="Profile picture"
+                                >
+                            {% else %}
+                                👤
+                            {% endif %}
+                        </a>
+
+                        <a
+                            href="{% url 'profile' post.author.username %}"
+                            class="post-author-name"
+                        >
+                            {{ post.author.username }}
+                        </a>
+
+                    </div>
+
+
+                    <div class="post-content">
+
+                        {% if post.title %}
+
+                            <h3>
+                                {{ post.title }}
+                            </h3>
+
+                        {% endif %}
+
+
+                        <p>
+                            {{ post.content }}
+                        </p>
+
+
+                        <div class="post-footer">
+
+                            {% if user.is_authenticated %}
+
+                                <a
+                                    href="/post/{{ post.id }}/like/"
+                                    class="like-button"
+                                >
+
+                                    {% if user in post.likes.all %}
+                                        ❤️ {{ post.likes.count }}
+                                    {% else %}
+                                        🤍 {{ post.likes.count }}
+                                    {% endif %}
+
+                                </a>
+
+                            {% else %}
+
+                                <span>
+                                    ❤️ {{ post.likes.count }}
+                                </span>
+
+                            {% endif %}
+
+
+                            <a
+                                href="https://wa.me/?text={{ post.content|urlencode }}"
+                                target="_blank"
+                            >
+                                📲 Share
+                            </a>
+
+                            {% if user.is_authenticated and user != post.author %}
+                                <a
+                                    href="{% url 'report_post' post.id %}"
+                                    class="report-button"
+                                >
+                                    🚩 Report
+                                </a>
+                            {% endif %}
+
+                            
+
+                        </div>
+
+
+                        <div class="comments">
+
+                            <h4>
+                                💬 Comments
+                            </h4>
+
+
+                            {% for comment in post.comments.all %}
+
+                                <div class="comment">
+
+                                    <div>
+
+                                        <strong>
+                                            <a href="{% url 'profile' comment.author.username %}" class="profile-user-link">
+    {{ comment.author.username }}
+</a>
+                                        </strong>
+
+                                        <p>
+                                            {{ comment.content }}
+                                        </p>
+
+                                    </div>
+
+
+                                    {% if comment.author == user %}
+
+                                        <a
+                                            href="/comment/{{ comment.id }}/delete/"
+                                            class="delete-comment"
+                                        >
+                                            🗑️
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            {% empty %}
+
+                                <p class="no-comments">
+                                    No comments yet.
+                                </p>
+
+                            {% endfor %}
+
+
+                            {% if user.is_authenticated %}
+
+                                <form
+                                    method="POST"
+                                    action="/post/{{ post.id }}/comment/"
+                                    class="comment-form"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="text"
+                                        name="content"
+                                        placeholder="Write a comment..."
+                                        maxlength="500"
+                                        required
+                                    >
+
+                                    <button type="submit">
+                                        Send
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <p class="login-comment">
+                                    <a href="/login/">
+                                        Login
+                                    </a>
+                                    to comment.
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% endif %}
+
+        {% empty %}
+
+            <div class="empty">
+
+                <h3>
+                    No memes yet 😂
+                </h3>
+
+                <p>
+                    Be the first first-year to post one.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+
+<section
+    class="section motivation-section"
+    id="motivation"
+>
+
+    <div class="section-heading">
+
+        <div>
+
+            <p class="small-title">
+                KEEP GOING
+            </p>
+
+            <h2>
+                💭 Motivation
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="posts">
+
+        {% for post in posts %}
+
+            {% if post.post_type == "MOTIVATION" %}
+
+                <article class="motivation-card">
+
+                    {% if post.image %}
+
+                        <img
+                            src="{{ post.image.url }}"
+                            alt="{{ post.title|default:'Motivation image' }}"
+                            class="motivation-image"
+                        >
+
+                    {% endif %}
+
+
+                    <div class="post-author">
+
+                        <a
+                            href="{% url 'profile' post.author.username %}"
+                            class="post-avatar"
+                        >
+                            {% if post.author.profile.profile_picture %}
+                                <img
+                                    src="{{ post.author.profile.profile_picture.url }}"
+                                    alt="Profile picture"
+                                >
+                            {% else %}
+                                👤
+                            {% endif %}
+                        </a>
+
+                        <a
+                            href="{% url 'profile' post.author.username %}"
+                            class="post-author-name"
+                        >
+                            {{ post.author.username }}
+                        </a>
+
+                    </div>
+
+
+                    <div class="quote">
+                        “{{ post.content }}”
+                    </div>
+
+
+                    {% if post.title %}
+
+                        <p class="quote-title">
+                            {{ post.title }}
+                        </p>
+
+                    {% endif %}
+
+
+                    <div class="post-footer">
+
+                        {% if user.is_authenticated %}
+
+                            <a
+                                href="/post/{{ post.id }}/like/"
+                                class="like-button"
+                            >
+
+                                {% if user in post.likes.all %}
+                                    ❤️ {{ post.likes.count }}
+                                {% else %}
+                                    🤍 {{ post.likes.count }}
+                                {% endif %}
+
+                            </a>
+
+                        {% else %}
+
+                            <span>
+                                ❤️ {{ post.likes.count }}
+                            </span>
+
+                        {% endif %}
+
+
+                        <a
+                            href="https://wa.me/?text={{ post.content|urlencode }}"
+                            target="_blank"
+                        >
+                            📲 Share
+                        </a>
+
+                        {% if user.is_authenticated and user != post.author %}
+                            <a
+                                href="{% url 'report_post' post.id %}"
+                                class="report-button"
+                            >
+                                🚩 Report
+                            </a>
+                        {% endif %}
+
+                        
+
+                        
+
+                    </div>
+
+
+                    <div class="comments">
+
+                        <h4>
+                            💬 Comments
+                        </h4>
+
+
+                        {% for comment in post.comments.all %}
+
+                            <div class="comment">
+
+                                <div>
+
+                                    <strong>
+                                        <a href="{% url 'profile' comment.author.username %}" class="profile-user-link">
+    {{ comment.author.username }}
+</a>
+                                    </strong>
+
+                                    <p>
+                                        {{ comment.content }}
+                                    </p>
+
+                                </div>
+
+
+                                {% if comment.author == user %}
+
+                                    <a
+                                        href="/comment/{{ comment.id }}/delete/"
+                                        class="delete-comment"
+                                    >
+                                        🗑️
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% empty %}
+
+                            <p class="no-comments">
+                                No comments yet.
+                            </p>
+
+                        {% endfor %}
+
+
+                        {% if user.is_authenticated %}
+
+                            <form
+                                method="POST"
+                                action="/post/{{ post.id }}/comment/"
+                                class="comment-form"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="text"
+                                    name="content"
+                                    placeholder="Write a comment..."
+                                    maxlength="500"
+                                    required
+                                >
+
+                                <button type="submit">
+                                    Send
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            <p class="login-comment">
+                                <a href="/login/">
+                                    Login
+                                </a>
+                                to comment.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+            {% endif %}
+
+        {% empty %}
+
+            <div class="empty">
+
+                <h3>
+                    No motivation posts yet 💭
+                </h3>
+
+                <p>
+                    Your words might be exactly what someone needs today.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+
+<section
+    class="join-section"
+    id="post"
+>
+
+    <div>
+
+        <p class="small-title">
+            CUEA FIRST YEARS
+        </p>
+
+
+        <h2>
+            Got something to say?
+        </h2>
+
+
+        <p>
+            Share a meme, motivation or campus moment
+            with your fellow first years.
+        </p>
+
+    </div>
+
+
+    {% if user.is_authenticated %}
+
+        <a
+            href="/post/create/"
+            class="btn primary"
+        >
+            ➕ Create a Post
+        </a>
+
+    {% else %}
+
+        <a
+            href="/register/"
+            class="btn primary"
+        >
+            🚀 Join the Community
+        </a>
+
+    {% endif %}
+
+</section>
+
+
+</main>
+
+
+
+<footer>
+
+    <p>
+        🎓 CUEA First Years Hub
+    </p>
+
+    <p>
+        Made for the First Years • 2026
+    </p>
+
+</footer>
+
+
+    <script src="{% static "js/mobile-menu.js" %}"></script>
+
+</body>
+
+</html>

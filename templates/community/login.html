@@ -1,0 +1,143 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login | CUEA First Years</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}?v=2"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        🎓 CUEA <span>First Years</span>
+    </div>
+
+    <button
+        type="button"
+        class="mobile-menu-button"
+
+        aria-label="Open navigation menu"
+    >
+        ☰
+    </button>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/register/">Sign Up</a>
+    </nav>
+
+</header>
+
+
+<main class="auth-page">
+
+    <div class="auth-card">
+
+        <p class="small-title">
+            WELCOME BACK
+        </p>
+
+        <h1>
+            Login 👋
+        </h1>
+
+        <p class="auth-description">
+            Sign in to your CUEA First Years account.
+        </p>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="form-group">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    class="form-input"
+                    placeholder="Your username"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    class="form-input"
+                    placeholder="Your password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="btn primary auth-button"
+            >
+                Login
+            </button>
+
+        </form>
+
+
+        <p class="auth-switch">
+            Don't have an account?
+            <a href="/register/">Create one</a>
+        </p>
+
+    </div>
+
+</main>
+
+
+<footer>
+    <p>🎓 CUEA First Years Hub</p>
+    <p>Made for the First Years • 2026</p>
+</footer>
+
+    <script src="{% static "js/mobile-menu.js" %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,269 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Search | CUEA First Years</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=1">
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">
+        🎓 CUEA <span>First Years</span>
+    </a>
+
+    <button
+        type="button"
+        class="mobile-menu-button"
+
+        aria-label="Open navigation menu"
+    >
+        ☰
+    </button>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/#memes">😂 Memes</a>
+        <a href="/#motivation">💭 Motivation</a>
+
+        {% if user.is_authenticated %}
+            <a href="/post/create/" class="nav-post">➕ Post</a>
+
+            <a href="{% url 'notifications' %}" class="nav-notifications">
+                🔔 Notifications
+                {% if unread_notifications %}
+                    <span class="notification-badge">
+                        {{ unread_notifications }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a href="{% url 'profile' user.username %}" class="nav-user">
+                {% if user.profile.profile_picture %}
+                    <img
+                        src="{{ user.profile.profile_picture.url }}"
+                        alt="Profile picture"
+                        class="nav-avatar"
+                    >
+                {% else %}
+                    <span class="nav-avatar-placeholder">👤</span>
+                {% endif %}
+
+                <span>{{ user.username }}</span>
+            </a>
+
+            <a href="/logout/">Logout</a>
+        {% else %}
+            <a href="/login/">Login</a>
+            <a href="/register/">Join</a>
+        {% endif %}
+    </nav>
+</header>
+
+
+<main class="profile-page">
+
+    <section class="profile-header">
+        <div class="profile-info">
+            <h1>🔎 Search</h1>
+            <p>Find posts, memes, motivation and CUEA First Years.</p>
+        </div>
+    </section>
+
+
+    <section class="search-section">
+
+        <form method="GET" action="{% url 'search' %}" class="search-form">
+
+            <input
+                type="search"
+                name="q"
+                value="{{ query }}"
+                placeholder="Search posts or users..."
+                class="form-input"
+                autocomplete="off"
+            >
+
+            <select name="type" class="form-input">
+                <option value="">All Posts</option>
+                <option value="MEME" {% if post_type == "MEME" %}selected{% endif %}>
+                    😂 Memes
+                </option>
+                <option value="MOTIVATION" {% if post_type == "MOTIVATION" %}selected{% endif %}>
+                    💭 Motivation
+                </option>
+            </select>
+
+            <button type="submit" class="profile-edit-button">
+                🔎 Search
+            </button>
+
+        </form>
+
+    </section>
+
+
+    {% if query and users %}
+
+        <section>
+            <h2>👤 Users</h2>
+
+            <div class="profile-posts-grid">
+
+                {% for profile_user in users %}
+
+                    <article class="profile-post-card">
+
+                        <div class="profile-post-content">
+
+                            <h3>
+                                <a
+                                    href="{% url 'profile' profile_user.username %}"
+                                    class="profile-user-link"
+                                >
+                                    {% if profile_user.profile.profile_picture %}
+                                        <img
+                                            src="{{ profile_user.profile.profile_picture.url }}"
+                                            alt="Profile picture"
+                                            class="nav-avatar"
+                                        >
+                                    {% else %}
+                                        👤
+                                    {% endif %}
+
+                                    {{ profile_user.username }}
+                                </a>
+                            </h3>
+
+                            {% if profile_user.profile.bio %}
+                                <p>{{ profile_user.profile.bio }}</p>
+                            {% endif %}
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+        </section>
+
+    {% endif %}
+
+
+    <section>
+
+        <h2>
+            {% if query %}
+                🔎 Results for "{{ query }}"
+            {% else %}
+                📰 All Posts
+            {% endif %}
+        </h2>
+
+
+        {% if posts %}
+
+            <div class="profile-posts-grid">
+
+                {% for post in posts %}
+
+                    <article class="profile-post-card">
+
+                        <div class="profile-post-content">
+
+                            <div class="profile-post-meta">
+
+                                <span>
+                                    {% if post.author.profile.profile_picture %}
+                                        <img
+                                            src="{{ post.author.profile.profile_picture.url }}"
+                                            alt="Profile picture"
+                                            class="nav-avatar"
+                                        >
+                                    {% else %}
+                                        👤
+                                    {% endif %}
+
+                                    <a
+                                        href="{% url 'profile' post.author.username %}"
+                                        class="profile-user-link"
+                                    >
+                                        {{ post.author.username }}
+                                    </a>
+                                </span>
+
+                                <span>
+                                    {{ post.created_at|timesince }} ago
+                                </span>
+
+                            </div>
+
+
+                            {% if post.post_type == "MEME" %}
+                                <span>😂 Meme</span>
+                            {% else %}
+                                <span>💭 Motivation</span>
+                            {% endif %}
+
+
+                            {% if post.title %}
+                                <h3>{{ post.title }}</h3>
+                            {% endif %}
+
+                            <p>{{ post.content }}</p>
+
+
+                            {% if post.image %}
+                                <img
+                                    src="{{ post.image.url }}"
+                                    alt="Post image"
+                                    class="profile-post-image"
+                                >
+                            {% endif %}
+
+
+                            <div class="profile-post-meta">
+                                ❤️ {{ post.likes.count }} likes
+                                ·
+                                💬 {{ post.comments.count }} comments
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="profile-empty">
+                <h3>Nothing found 😅</h3>
+                <p>
+                    Try a different search term or post category.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    <p>🎓 CUEA First Years — Campus life, memories & motivation.</p>
+</footer>
+
+    <script src="{% static "js/mobile-menu.js" %}"></script>
+
+</body>
+</html>

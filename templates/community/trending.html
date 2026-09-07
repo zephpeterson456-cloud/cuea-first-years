@@ -1,0 +1,185 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Trending | CUEA First Years</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=1">
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">
+        🎓 CUEA <span>First Years</span>
+    </a>
+
+    <button
+        type="button"
+        class="mobile-menu-button"
+
+        aria-label="Open navigation menu"
+    >
+        ☰
+    </button>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/#memes">😂 Memes</a>
+        <a href="/#motivation">💭 Motivation</a>
+        <a href="{% url 'search' %}">🔎 Search</a>
+        <a href="{% url 'trending' %}">🔥 Trending</a>
+
+        {% if user.is_authenticated %}
+            <a href="/post/create/" class="nav-post">➕ Post</a>
+
+            <a href="{% url 'notifications' %}" class="nav-notifications">
+                🔔 Notifications
+                {% if unread_notifications %}
+                    <span class="notification-badge">
+                        {{ unread_notifications }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a href="{% url 'profile' user.username %}" class="nav-user">
+                {% if user.profile.profile_picture %}
+                    <img
+                        src="{{ user.profile.profile_picture.url }}"
+                        alt="Profile picture"
+                        class="nav-avatar"
+                    >
+                {% else %}
+                    <span class="nav-avatar-placeholder">👤</span>
+                {% endif %}
+
+                <span>{{ user.username }}</span>
+            </a>
+
+            <a href="/logout/">Logout</a>
+        {% else %}
+            <a href="/login/">Login</a>
+            <a href="/register/">Join</a>
+        {% endif %}
+    </nav>
+</header>
+
+
+<main class="profile-page">
+
+    <section class="profile-header">
+        <div class="profile-info">
+            <h1>🔥 Trending</h1>
+            <p>The posts getting the most love from CUEA First Years.</p>
+        </div>
+    </section>
+
+
+    <section>
+
+        {% if posts %}
+
+            <div class="profile-posts-grid">
+
+                {% for post in posts %}
+
+                    <article class="profile-post-card">
+
+                        <div class="profile-post-content">
+
+                            <div class="profile-post-meta">
+
+                                <span>
+                                    {% if post.author.profile.profile_picture %}
+                                        <img
+                                            src="{{ post.author.profile.profile_picture.url }}"
+                                            alt="Profile picture"
+                                            class="nav-avatar"
+                                        >
+                                    {% else %}
+                                        👤
+                                    {% endif %}
+
+                                    <a
+                                        href="{% url 'profile' post.author.username %}"
+                                        class="profile-user-link"
+                                    >
+                                        {{ post.author.username }}
+                                    </a>
+                                </span>
+
+                                <span>
+                                    {{ post.created_at|timesince }} ago
+                                </span>
+
+                            </div>
+
+
+                            <div class="trending-rank">
+                                🔥 #{{ forloop.counter }}
+                            </div>
+
+
+                            {% if post.post_type == "MEME" %}
+                                <span>😂 Meme</span>
+                            {% else %}
+                                <span>💭 Motivation</span>
+                            {% endif %}
+
+
+                            {% if post.title %}
+                                <h3>{{ post.title }}</h3>
+                            {% endif %}
+
+                            <p>{{ post.content }}</p>
+
+
+                            {% if post.image %}
+                                <img
+                                    src="{{ post.image.url }}"
+                                    alt="Post image"
+                                    class="profile-post-image"
+                                >
+                            {% endif %}
+
+
+                            <div class="profile-post-meta">
+                                ❤️ {{ post.like_count }} likes
+                                ·
+                                💬 {{ post.comment_count }} comments
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="profile-empty">
+                <h3>No trending posts yet 😅</h3>
+                <p>Start posting and get the community talking!</p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    <p>🎓 CUEA First Years — Campus life, memories & motivation.</p>
+</footer>
+
+    <script src="{% static "js/mobile-menu.js" %}"></script>
+
+</body>
+</html>

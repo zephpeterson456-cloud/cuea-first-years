@@ -1,0 +1,277 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ profile_user.username }} | CUEA First Years</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=1">
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">
+        🎓 CUEA <span>First Years</span>
+    </a>
+
+    <button
+        type="button"
+        class="mobile-menu-button"
+
+        aria-label="Open navigation menu"
+    >
+        ☰
+    </button>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/#memes">😂 Memes</a>
+        <a href="/#motivation">💭 Motivation</a>
+        <a href="{% url 'search' %}">🔎 Search</a>
+
+        {% if user.is_authenticated %}
+            <a href="/post/create/" class="nav-post">➕ Post</a>
+
+            <a href="{% url 'notifications' %}" class="nav-notifications">
+                🔔 Notifications
+                {% if unread_notifications %}
+                    <span class="notification-badge">
+                        {{ unread_notifications }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a href="{% url 'profile' user.username %}" class="nav-user">
+                👤 {{ user.username }}
+            </a>
+
+            <a href="/logout/">Logout</a>
+        {% endif %}
+    </nav>
+</header>
+
+
+<main class="profile-page">
+
+    <section class="profile-header">
+
+        <div class="profile-avatar">
+            {% if profile_user.profile.profile_picture %}
+                <img
+                    src="{{ profile_user.profile.profile_picture.url }}"
+                    alt="{{ profile_user.username }} profile picture"
+                >
+            {% else %}
+                👤
+            {% endif %}
+        </div>
+
+        <div class="profile-info">
+
+            <h1>{{ profile_user.username }}</h1>
+
+            {% if profile_user.profile.bio %}
+                <p>{{ profile_user.profile.bio }}</p>
+            {% else %}
+                <p class="profile-empty-bio">
+                    No bio yet.
+                </p>
+            {% endif %}
+
+            <div class="profile-stats">
+
+                <div>
+                    <strong>{{ posts.count }}</strong>
+                    <span>Posts</span>
+                </div>
+
+                <div>
+                    <strong>{{ likes_received }}</strong>
+                    <span>Likes</span>
+                </div>
+
+                <div>
+                    <a href="{% url 'followers' profile_user.username %}" class="profile-stat-link">
+                        <strong>{{ followers_count }}</strong>
+                        <span>Followers</span>
+                    </a>
+                </div>
+
+                <div>
+                    <a href="{% url 'following' profile_user.username %}" class="profile-stat-link">
+                        <strong>{{ following_count }}</strong>
+                        <span>Following</span>
+                    </a>
+                </div>
+
+            </div>
+
+            {% if request.user == profile_user %}
+
+                <a
+                    href="{% url 'edit_profile' %}"
+                    class="profile-edit-button"
+                >
+                    ✏️ Edit Profile
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{% url 'toggle_follow' profile_user.username %}"
+                    class="profile-edit-button follow-button"
+                >
+                    {% if is_following %}
+                        👥 Unfollow
+                    {% else %}
+                        ➕ Follow
+                    {% endif %}
+                </a>
+
+            {% endif %}
+
+        </div>
+
+                <div>
+                    <strong>{{ likes_received }}</strong>
+                    <span>Likes Received</span>
+                </div>
+
+                <div>
+                    <strong>{{ profile_user.date_joined|date:"M Y" }}</strong>
+                    <span>Joined</span>
+                </div>
+            </div>
+
+            {% if request.user == profile_user %}
+                <a
+                    href="{% url 'edit_profile' %}"
+                    class="profile-edit-button"
+                >
+                    ✏️ Edit Profile
+                </a>
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <section>
+
+        <div class="profile-section-title">
+            <h2>Posts by {{ profile_user.username }}</h2>
+        </div>
+
+        {% if posts %}
+
+            <div class="profile-posts-grid">
+
+                {% for post in posts %}
+
+                    <article class="profile-post-card">
+
+                        <div class="profile-post-content">
+
+                            <div class="profile-post-meta">
+                                <span>👤 {{ post.author.username }}</span>
+                                <span>{{ post.created_at|date:"M d, Y" }}</span>
+                            </div>
+
+                            {% if post.title %}
+                                <h3>{{ post.title }}</h3>
+                            {% endif %}
+
+                            <p>{{ post.content }}</p>
+
+                        </div>
+
+                        {% if post.image %}
+                            <img
+                                src="{{ post.image.url }}"
+                                alt="{{ post.title|default:'Post image' }}"
+                                class="profile-post-image"
+                            >
+                        {% endif %}
+
+                        <div class="profile-post-footer">
+                            ❤️ {{ post.likes.count }}
+                            &nbsp;&nbsp;
+                            💬 {{ post.comments.count }}
+
+                            {% if request.user == post.author %}
+
+                                <div class="post-owner-actions">
+
+                                    <a
+                                        href="{% url 'edit_post' post.id %}"
+                                        class="post-action edit-action"
+                                    >
+                                        ✏️ Edit
+                                    </a>
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'delete_post' post.id %}"
+                                        onsubmit="return confirm('Delete this post permanently?');"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="post-action delete-action"
+                                        >
+                                            🗑️ Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            {% endif %}
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="profile-empty">
+                <h3>No posts yet 👀</h3>
+
+                <p>
+                    {{ profile_user.username }} hasn't posted anything yet.
+                </p>
+
+                {% if request.user == profile_user %}
+                    <a
+                        href="{% url 'create_post' %}"
+                        class="profile-edit-button"
+                    >
+                        ➕ Create Your First Post
+                    </a>
+                {% endif %}
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    <p>🎓 CUEA First Years — Campus life, memories & motivation.</p>
+</footer>
+
+    <script src="{% static "js/mobile-menu.js" %}"></script>
+
+</body>
+</html>

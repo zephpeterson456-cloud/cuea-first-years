@@ -1,0 +1,147 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Report Post | CUEA First Years</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=1">
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">
+        🎓 CUEA <span>First Years</span>
+    </a>
+
+    <button
+        type="button"
+        class="mobile-menu-button"
+
+        aria-label="Open navigation menu"
+    >
+        ☰
+    </button>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/#memes">😂 Memes</a>
+        <a href="/#motivation">💭 Motivation</a>
+        <a href="{% url 'search' %}">🔎 Search</a>
+        <a href="{% url 'trending' %}">🔥 Trending</a>
+
+        {% if user.is_authenticated %}
+            <a href="/post/create/" class="nav-post">➕ Post</a>
+
+            <a href="{% url 'notifications' %}" class="nav-notifications">
+                🔔 Notifications
+                {% if unread_notifications %}
+                    <span class="notification-badge">
+                        {{ unread_notifications }}
+                    </span>
+                {% endif %}
+            </a>
+
+            <a href="{% url 'profile' user.username %}" class="nav-user">
+                {% if user.profile.profile_picture %}
+                    <img
+                        src="{{ user.profile.profile_picture.url }}"
+                        alt="Profile picture"
+                        class="nav-avatar"
+                    >
+                {% else %}
+                    <span class="nav-avatar-placeholder">👤</span>
+                {% endif %}
+
+                <span>{{ user.username }}</span>
+            </a>
+
+            <a href="/logout/">Logout</a>
+        {% endif %}
+    </nav>
+</header>
+
+
+<main class="create-page">
+
+    <section class="create-card">
+
+        <h1>🚩 Report Post</h1>
+
+        <p class="create-description">
+            Help keep the CUEA First Years community safe.
+        </p>
+
+        <div class="moderation-note">
+            <strong>{{ post.author.username }}</strong>
+            {% if post.title %}
+                — {{ post.title }}
+            {% endif %}
+            <br>
+            {{ post.content|truncatechars:180 }}
+        </div>
+
+        {% if form.errors %}
+            <div class="form-errors">
+                Please correct the errors below.
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.reason.id_for_label }}">
+                    Why are you reporting this post?
+                </label>
+
+                {{ form.reason }}
+                {{ form.reason.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.details.id_for_label }}">
+                    Additional details
+                </label>
+
+                {{ form.details }}
+                {{ form.details.errors }}
+            </div>
+
+            <div class="form-actions">
+
+                <a
+                    href="{% url 'home' %}"
+                    class="btn"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    🚩 Submit Report
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    <p>🎓 CUEA First Years — Campus life, memories & motivation.</p>
+</footer>
+
+    <script src="{% static "js/mobile-menu.js" %}"></script>
+
+</body>
+</html>

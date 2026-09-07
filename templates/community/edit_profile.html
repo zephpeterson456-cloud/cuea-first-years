@@ -1,0 +1,130 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Profile | CUEA First Years</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=1">
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">
+        🎓 CUEA <span>First Years</span>
+    </a>
+
+    <button
+        type="button"
+        class="mobile-menu-button"
+
+        aria-label="Open navigation menu"
+    >
+        ☰
+    </button>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/#memes">😂 Memes</a>
+        <a href="/#motivation">💭 Motivation</a>
+        <a href="{% url 'search' %}">🔎 Search</a>
+        <a href="/post/create/" class="nav-post">➕ Post</a>
+
+            <a href="{% url 'notifications' %}" class="nav-notifications">
+                🔔 Notifications
+                {% if unread_notifications %}
+                    <span class="notification-badge">
+                        {{ unread_notifications }}
+                    </span>
+                {% endif %}
+            </a>
+        <a href="{% url 'profile' user.username %}" class="nav-user">
+            👤 {{ user.username }}
+        </a>
+        <a href="/logout/">Logout</a>
+    </nav>
+</header>
+
+
+<main class="profile-edit-page">
+
+    <div class="profile-edit-card">
+
+        <h1>✏️ Edit Profile</h1>
+
+        <p class="profile-edit-description">
+            Customize your CUEA First Years profile.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="profile-form-group">
+
+                <label for="{{ form.bio.id_for_label }}">
+                    Bio
+                </label>
+
+                {{ form.bio }}
+
+            </div>
+
+
+            <div class="profile-form-group">
+
+                <label for="{{ form.profile_picture.id_for_label }}">
+                    Profile Picture
+                </label>
+
+                {% if user.profile.profile_picture %}
+                    <div class="profile-current-picture">
+                        <img
+                            src="{{ user.profile.profile_picture.url }}"
+                            alt="Current profile picture"
+                        >
+                    </div>
+                {% endif %}
+
+                {{ form.profile_picture }}
+
+            </div>
+
+
+            <div class="profile-form-actions">
+
+                <button
+                    type="submit"
+                    class="profile-save-button"
+                >
+                    💾 Save Profile
+                </button>
+
+                <a
+                    href="{% url 'profile' user.username %}"
+                    class="profile-cancel-button"
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+
+<footer class="footer">
+    <p>🎓 CUEA First Years — Campus life, memories & motivation.</p>
+</footer>
+
+    <script src="{% static "js/mobile-menu.js" %}"></script>
+
+</body>
+</html>
