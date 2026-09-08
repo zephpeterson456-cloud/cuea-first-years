@@ -9,7 +9,7 @@
     <title>Followers | CUEA First Years</title>
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=2">
 </head>
 
 <body>
@@ -22,11 +22,11 @@
     <button
         type="button"
         class="mobile-menu-button"
-
         aria-label="Open navigation menu"
     >
         ☰
     </button>
+
     <nav>
         <a href="/">Home</a>
         <a href="/#memes">😂 Memes</a>
@@ -56,6 +56,7 @@
                 {% else %}
                     <span class="nav-avatar-placeholder">👤</span>
                 {% endif %}
+
                 <span>{{ user.username }}</span>
             </a>
 
@@ -64,13 +65,16 @@
     </nav>
 </header>
 
-
 <main class="profile-page">
 
     <section class="profile-header">
         <div class="profile-info">
+
             <h1>👥 Followers</h1>
-            <p>People following {{ profile_user.username }}.</p>
+
+            <p>
+                People following {{ profile_user.username }}.
+            </p>
 
             <a
                 href="{% url 'profile' profile_user.username %}"
@@ -78,17 +82,17 @@
             >
                 ← Back to Profile
             </a>
+
         </div>
     </section>
 
-
     <section>
 
-        {% if users %}
+        {% if followers %}
 
             <div class="people-list">
 
-                {% for person in users %}
+                {% for person in followers %}
 
                     <a
                         href="{% url 'profile' person.username %}"
@@ -96,25 +100,41 @@
                     >
 
                         {% if person.profile.profile_picture %}
+
                             <img
                                 src="{{ person.profile.profile_picture.url }}"
-                                alt="Profile picture"
+                                alt="{{ person.username }} profile picture"
                                 class="person-avatar"
                             >
+
                         {% else %}
+
                             <span class="person-avatar-placeholder">
                                 👤
                             </span>
+
                         {% endif %}
 
                         <div class="person-info">
-                            <strong>{{ person.username }}</strong>
+
+                            <strong>
+                                {{ person.username }}
+                            </strong>
 
                             {% if person.profile.bio %}
-                                <span>{{ person.profile.bio|truncatechars:70 }}</span>
+
+                                <span>
+                                    {{ person.profile.bio|truncatechars:70 }}
+                                </span>
+
                             {% else %}
-                                <span>CUEA First Years member</span>
+
+                                <span>
+                                    CUEA First Years member
+                                </span>
+
                             {% endif %}
+
                         </div>
 
                     </a>
@@ -126,8 +146,15 @@
         {% else %}
 
             <div class="profile-empty">
+
                 <h3>No followers yet 👀</h3>
-                <p>People who follow {{ profile_user.username }} will appear here.</p>
+
+                <p>
+                    People who follow
+                    {{ profile_user.username }}
+                    will appear here.
+                </p>
+
             </div>
 
         {% endif %}
@@ -136,12 +163,13 @@
 
 </main>
 
-
 <footer class="footer">
-    <p>🎓 CUEA First Years — Campus life, memories & motivation.</p>
+    <p>
+        🎓 CUEA First Years — Campus life, memories & motivation.
+    </p>
 </footer>
 
-    <script src="{% static "js/mobile-menu.js" %}"></script>
+<script src="{% static 'js/mobile-menu.js' %}"></script>
 
 </body>
 </html>

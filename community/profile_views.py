@@ -8,30 +8,43 @@ from .models import Profile, Follow
 
 @login_required
 def profile(request, username):
-    user = get_object_or_404(User, username=username)
+    profile_user = get_object_or_404(
+        User,
+        username=username,
+    )
 
-    posts = user.posts.filter(approved=True)
+    posts = profile_user.posts.filter(
+        approved=True
+    )
 
     likes_received = sum(
         post.likes.count()
         for post in posts
     )
 
+    followers_count = Follow.objects.filter(
+        following=profile_user
+    ).count()
+
+    following_count = Follow.objects.filter(
+        follower=profile_user
+    ).count()
+
     is_following = Follow.objects.filter(
         follower=request.user,
-        following=user,
+        following=profile_user,
     ).exists()
 
     return render(
         request,
         "community/profile.html",
         {
-            "profile_user": user,
+            "profile_user": profile_user,
             "posts": posts,
             "likes_received": likes_received,
+            "followers_count": followers_count,
+            "following_count": following_count,
             "is_following": is_following,
-            "followers_count": Follow.objects.filter(following=user).count(),
-            "following_count": Follow.objects.filter(follower=user).count(),
         },
     )
 
@@ -65,15 +78,22 @@ def edit_profile(request):
     return render(
         request,
         "community/edit_profile.html",
-        {"form": form},
+        {
+            "form": form,
+        },
     )
 
 
 @login_required
 def toggle_follow(request, username):
-    user_to_follow = get_object_or_404(User, username=username)
+    user_to_follow = get_object_or_404(
+        User,
+        username=username,
+    )
 
+    # Users cannot follow themselves.
     if request.user != user_to_follow:
+
         follow = Follow.objects.filter(
             follower=request.user,
             following=user_to_follow,
@@ -95,27 +115,55 @@ def toggle_follow(request, username):
 
 @login_required
 def followers(request, username):
-    user = get_object_or_404(User, username=username)
+    profile_user = get_object_or_404(
+        User,
+        username=username,
+    )
+
+    follow_records = Follow.objects.filter(
+        following=profile_user
+    ).select_related(
+        "follower"
+    )
+
+    followers = [
+        follow.follower
+        for follow in follow_records
+    ]
 
     return render(
         request,
         "community/followers.html",
         {
-            "profile_user": user,
-            "followers": user.profile.followers.all(),
+            "profile_user": profile_user,
+            "followers": followers,
         },
     )
 
 
 @login_required
 def following(request, username):
-    user = get_object_or_404(User, username=username)
+    profile_user = get_object_or_404(
+        User,
+        username=username,
+    )
+
+    follow_records = Follow.objects.filter(
+        follower=profile_user
+    ).select_related(
+        "following"
+    )
+
+    following = [
+        follow.following
+        for follow in follow_records
+    ]
 
     return render(
         request,
         "community/following.html",
         {
-            "profile_user": user,
-            "following": user.profile.following.all(),
+            "profile_user": profile_user,
+            "following": following,
         },
     )
