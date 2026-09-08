@@ -10,24 +10,12 @@ from .models import Profile
 def profile(request, username):
     user = get_object_or_404(User, username=username)
 
-    posts = user.posts.filter(
-        approved=True
-    )
+    posts = user.posts.filter(approved=True)
 
     likes_received = sum(
         post.likes.count()
         for post in posts
     )
-
-    followers_count = user.followers.count()
-    following_count = user.following.count()
-
-    is_following = False
-
-    if request.user != user:
-        is_following = user.followers.filter(
-            follower=request.user
-        ).exists()
 
     return render(
         request,
@@ -36,9 +24,6 @@ def profile(request, username):
             "profile_user": user,
             "posts": posts,
             "likes_received": likes_received,
-            "followers_count": followers_count,
-            "following_count": following_count,
-            "is_following": is_following,
         },
     )
 
@@ -72,39 +57,25 @@ def edit_profile(request):
     return render(
         request,
         "community/edit_profile.html",
-        {
-            "form": form,
-        },
+        {"form": form},
     )
 
 
 @login_required
 def toggle_follow(request, username):
-    from .models import Follow
+    user_to_follow = get_object_or_404(User, username=username)
 
-    target_user = get_object_or_404(
-        User,
-        username=username,
-    )
-
-    if target_user == request.user:
-        return redirect(
-            "profile",
-            username=username,
-        )
-
-    follow = Follow.objects.filter(
-        follower=request.user,
-        following=target_user,
-    ).first()
-
-    if follow:
-        follow.delete()
-    else:
-        Follow.objects.create(
-            follower=request.user,
-            following=target_user,
-        )
+    if request.user != user_to_follow:
+        if request.user.profile.following.filter(
+            id=user_to_follow.id
+        ).exists():
+            request.user.profile.following.remove(
+                user_to_follow
+            )
+        else:
+            request.user.profile.following.add(
+                user_to_follow
+            )
 
     return redirect(
         "profile",
@@ -114,49 +85,27 @@ def toggle_follow(request, username):
 
 @login_required
 def followers(request, username):
-    from .models import Follow
-
-    profile_user = get_object_or_404(
-        User,
-        username=username,
-    )
-
-    follower_users = User.objects.filter(
-        following__following=profile_user
-    ).select_related(
-        "profile"
-    )
+    user = get_object_or_404(User, username=username)
 
     return render(
         request,
         "community/followers.html",
         {
-            "profile_user": profile_user,
-            "users": follower_users,
+            "profile_user": user,
+            "followers": user.profile.followers.all(),
         },
     )
 
 
 @login_required
 def following(request, username):
-    from .models import Follow
-
-    profile_user = get_object_or_404(
-        User,
-        username=username,
-    )
-
-    following_users = User.objects.filter(
-        followers__follower=profile_user
-    ).select_related(
-        "profile"
-    )
+    user = get_object_or_404(User, username=username)
 
     return render(
         request,
         "community/following.html",
         {
-            "profile_user": profile_user,
-            "users": following_users,
+            "profile_user": user,
+            "following": user.profile.following.all(),
         },
     )
