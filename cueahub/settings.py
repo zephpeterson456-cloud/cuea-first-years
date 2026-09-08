@@ -49,6 +49,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Application definition
 INSTALLED_APPS = [
+    'storages',
     'community.apps.CommunityConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -137,7 +138,7 @@ STATICFILES_DIRS = [
 
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "storages.backends.s3.S3Storage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
@@ -151,3 +152,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Supabase Storage
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_STORAGE_BUCKET = os.getenv("SUPABASE_STORAGE_BUCKET", "Media")
+SUPABASE_S3_ENDPOINT = os.getenv("SUPABASE_S3_ENDPOINT", f"{SUPABASE_URL}/storage/v1/s3")
+
+AWS_S3_ENDPOINT_URL = SUPABASE_S3_ENDPOINT
+AWS_STORAGE_BUCKET_NAME = SUPABASE_STORAGE_BUCKET
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "eu-central-1")
+AWS_S3_ADDRESSING_STYLE = "path"
