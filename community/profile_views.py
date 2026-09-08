@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ProfileForm
-from .models import Profile
+from .models import Profile, Follow
 
 
 @login_required
@@ -17,6 +17,11 @@ def profile(request, username):
         for post in posts
     )
 
+    is_following = Follow.objects.filter(
+        follower=request.user,
+        following=user,
+    ).exists()
+
     return render(
         request,
         "community/profile.html",
@@ -24,6 +29,9 @@ def profile(request, username):
             "profile_user": user,
             "posts": posts,
             "likes_received": likes_received,
+            "is_following": is_following,
+            "followers_count": Follow.objects.filter(following=user).count(),
+            "following_count": Follow.objects.filter(follower=user).count(),
         },
     )
 
@@ -66,15 +74,17 @@ def toggle_follow(request, username):
     user_to_follow = get_object_or_404(User, username=username)
 
     if request.user != user_to_follow:
-        if request.user.profile.following.filter(
-            id=user_to_follow.id
-        ).exists():
-            request.user.profile.following.remove(
-                user_to_follow
-            )
+        follow = Follow.objects.filter(
+            follower=request.user,
+            following=user_to_follow,
+        ).first()
+
+        if follow:
+            follow.delete()
         else:
-            request.user.profile.following.add(
-                user_to_follow
+            Follow.objects.create(
+                follower=request.user,
+                following=user_to_follow,
             )
 
     return redirect(
