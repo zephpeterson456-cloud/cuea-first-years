@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
+import json
+
 from .forms import PostForm
-from .models import Post, Notification
+from .models import Post, Notification, PushSubscription
 
 
 def home(request):
@@ -65,6 +68,15 @@ def toggle_like(request, post_id):
                 post=post,
             )
 
+            from .push import send_push_notification
+
+            send_push_notification(
+                post.author,
+                "❤️ New Like",
+                f"{request.user.username} liked your post.",
+                f"/post/{post.id}/",
+            )
+
     return redirect(request.META.get("HTTP_REFERER", "home"))
 
 
@@ -100,6 +112,15 @@ def add_comment(request, post_id):
                 notification_type="COMMENT",
                 post=post,
                 comment=comment,
+            )
+
+            from .push import send_push_notification
+
+            send_push_notification(
+                post.author,
+                "💬 New Comment",
+                f"{request.user.username} commented on your post.",
+                f"/post/{post.id}/",
             )
 
     return redirect(
@@ -385,3 +406,32 @@ def report_post(request, post_id):
             "post": post,
         },
     )
+
+@login_required
+def save_push_subscription(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+
+        endpoint = data["endpoint"]
+        p256dh = data["keys"]["p256dh"]
+        auth = data["keys"]["auth"]
+
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return JsonResponse(
+            {"error": "Invalid subscription data"},
+            status=400,
+        )
+
+    PushSubscription.objects.update_or_create(
+        endpoint=endpoint,
+        defaults={
+            "user": request.user,
+            "p256dh": p256dh,
+            "auth": auth,
+        },
+    )
+
+    return JsonResponse({"success": True})

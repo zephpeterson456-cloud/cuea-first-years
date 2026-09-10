@@ -80,6 +80,15 @@
 
             </a>
 
+            <button
+                id="enable-notifications"
+                type="button"
+                data-public-key="{{ VAPID_PUBLIC_KEY }}"
+                class="nav-post"
+            >
+                🔔 Enable Notifications
+            </button>
+
             <a href="/logout/">
                 Logout
             </a>
@@ -700,6 +709,7 @@
 
     <script src="{% static "js/mobile-menu.js" %}"></script>
 
+<script src="{% static 'js/push-notifications.js' %}"></script>
 </body>
 
 </html>

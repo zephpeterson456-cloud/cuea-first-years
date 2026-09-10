@@ -107,6 +107,22 @@ def toggle_follow(request, username):
                 following=user_to_follow,
             )
 
+            from .models import Notification
+            from .push import send_push_notification
+
+            Notification.objects.create(
+                recipient=user_to_follow,
+                sender=request.user,
+                notification_type="FOLLOW",
+            )
+
+            send_push_notification(
+                user_to_follow,
+                "👥 New Follower",
+                f"{request.user.username} started following you.",
+                f"/profile/{request.user.username}/",
+            )
+
     return redirect(
         "profile",
         username=username,

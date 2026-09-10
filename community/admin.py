@@ -1,6 +1,12 @@
 from django.contrib import admin
 
 from .models import Comment, Post, Profile
+try:
+    from .push import send_push_notification
+except ModuleNotFoundError:
+    def send_push_notification(*args, **kwargs):
+        return None
+
 
 
 @admin.register(Profile)
@@ -44,6 +50,27 @@ class PostAdmin(admin.ModelAdmin):
     list_editable = (
         "approved",
     )
+
+    def save_model(self, request, obj, form, change):
+        was_approved = False
+
+        if change:
+            was_approved = (
+                Post.objects
+                .filter(pk=obj.pk)
+                .values_list("approved", flat=True)
+                .first()
+            )
+
+        super().save_model(request, obj, form, change)
+
+        if change and not was_approved and obj.approved:
+            send_push_notification(
+                obj.author,
+                "📢 Your Post Was Approved",
+                f"Your post \"{obj.title}\" is now live.",
+                f"/post/{obj.id}/",
+            )
 
 
 @admin.register(Comment)

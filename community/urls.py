@@ -59,11 +59,11 @@ urlpatterns.append(
 )
 
 
-# Report a post
+# Push notification subscription
 urlpatterns.append(
     path(
-        "post/<int:post_id>/report/",
-        views.report_post,
-        name="report_post",
+        "push/subscribe/",
+        views.save_push_subscription,
+        name="save_push_subscription",
     )
 )
