@@ -254,3 +254,83 @@ class PushSubscription(models.Model):
 
     def __str__(self):
         return f"Push subscription for {self.user.username}"
+
+
+class Poll(models.Model):
+    question = models.CharField(
+        max_length=300,
+    )
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="polls",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    approved = models.BooleanField(
+        default=False,
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.question
+
+
+class PollOption(models.Model):
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name="options",
+    )
+
+    text = models.CharField(
+        max_length=200,
+    )
+
+    votes = models.PositiveIntegerField(
+        default=0,
+    )
+
+    def __str__(self):
+        return f"{self.poll.question} - {self.text}"
+
+
+class PollVote(models.Model):
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name="votes_cast",
+    )
+
+    option = models.ForeignKey(
+        PollOption,
+        on_delete=models.CASCADE,
+        related_name="vote_records",
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="poll_votes",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["poll", "user"],
+                name="one_vote_per_poll",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} voted in {self.poll.question}"

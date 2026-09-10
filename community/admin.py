@@ -95,3 +95,63 @@ class CommentAdmin(admin.ModelAdmin):
 from .models import Report
 
 admin.site.register(Report)
+
+
+from .models import Poll, PollOption, PollVote
+
+
+@admin.register(Poll)
+class PollAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "question",
+        "author",
+        "approved",
+        "created_at",
+    )
+
+    list_filter = (
+        "approved",
+        "created_at",
+    )
+
+    search_fields = (
+        "question",
+        "author__username",
+    )
+
+    list_editable = (
+        "approved",
+    )
+
+
+@admin.register(PollOption)
+class PollOptionAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "poll",
+        "text",
+        "votes",
+    )
+
+    search_fields = (
+        "text",
+        "poll__question",
+    )
+
+
+@admin.register(PollVote)
+class PollVoteAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "poll",
+        "option",
+        "user",
+        "created_at",
+    )
+
+    search_fields = (
+        "poll__question",
+        "option__text",
+        "user__username",
+    )

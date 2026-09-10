@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 import json
 
 from .forms import PostForm
-from .models import Post, Notification, PushSubscription
+from .models import Post, Notification, PushSubscription, Poll, PollOption, PollVote
 
 
 def home(request):
@@ -435,3 +435,118 @@ def save_push_subscription(request):
     )
 
     return JsonResponse({"success": True})
+
+
+@login_required
+def create_poll(request):
+    if request.method == "POST":
+        question = request.POST.get("question", "").strip()
+
+        options = [
+            request.POST.get(f"option{i}", "").strip()
+            for i in range(1, 6)
+        ]
+
+        options = [option for option in options if option]
+
+        if not question:
+            return render(
+                request,
+                "community/create_poll.html",
+                {"error": "Please enter a question."},
+            )
+
+        if len(options) < 2:
+            return render(
+                request,
+                "community/create_poll.html",
+                {"error": "Please provide at least two options."},
+            )
+
+        poll = Poll.objects.create(
+            question=question,
+            author=request.user,
+            approved=False,
+        )
+
+        for option_text in options:
+            PollOption.objects.create(
+                poll=poll,
+                text=option_text,
+            )
+
+        return redirect("home")
+
+    return render(
+        request,
+        "community/create_poll.html",
+    )
+
+
+def polls(request):
+    polls = Poll.objects.filter(
+        approved=True
+    ).select_related(
+        "author"
+    ).prefetch_related(
+        "options"
+    )
+
+    voted_poll_ids = set()
+
+    if request.user.is_authenticated:
+        voted_poll_ids = set(
+            PollVote.objects.filter(
+                user=request.user,
+                poll__in=polls,
+            ).values_list(
+                "poll_id",
+                flat=True,
+            )
+        )
+
+    return render(
+        request,
+        "community/polls.html",
+        {
+            "polls": polls,
+            "voted_poll_ids": voted_poll_ids,
+        },
+    )
+
+
+@login_required
+def vote_poll(request, poll_id):
+    if request.method != "POST":
+        return redirect("polls")
+
+    poll = get_object_or_404(
+        Poll,
+        id=poll_id,
+        approved=True,
+    )
+
+    option_id = request.POST.get("option")
+
+    option = get_object_or_404(
+        PollOption,
+        id=option_id,
+        poll=poll,
+    )
+
+    if PollVote.objects.filter(
+        poll=poll,
+        user=request.user,
+    ).exists():
+        return redirect("polls")
+
+    PollVote.objects.create(
+        poll=poll,
+        option=option,
+        user=request.user,
+    )
+
+    option.votes += 1
+    option.save(update_fields=["votes"])
+
+    return redirect("polls")

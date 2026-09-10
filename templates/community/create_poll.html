@@ -1,0 +1,195 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Poll | CUEA First Years Hub</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}?v=2"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/profile.css' %}?v=1"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a href="/" class="logo">
+        🎓 CUEA <span>First Years</span>
+    </a>
+
+    <button
+        type="button"
+        class="mobile-menu-button"
+        aria-label="Open navigation menu"
+    >
+        ☰
+    </button>
+
+    <nav>
+
+        <a href="/">Home</a>
+
+        <a href="/#memes">
+            😂 Memes
+        </a>
+
+        <a href="/#motivation">
+            💭 Motivation
+        </a>
+
+        {% if user.is_authenticated %}
+
+            <a href="/post/create/" class="nav-post">
+                ➕ Post
+            </a>
+
+            <a
+                href="{% url 'profile' user.username %}"
+                class="nav-user"
+            >
+                {% if user.profile.profile_picture %}
+                    <img
+                        src="{{ user.profile.profile_picture.url }}"
+                        alt="Profile picture"
+                        class="nav-avatar"
+                    >
+                {% else %}
+                    <span class="nav-avatar-placeholder">👤</span>
+                {% endif %}
+
+                <span>{{ user.username }}</span>
+            </a>
+
+            <a href="/logout/">
+                Logout
+            </a>
+
+        {% else %}
+
+            <a href="/login/">
+                Login
+            </a>
+
+            <a href="/register/">
+                Register
+            </a>
+
+        {% endif %}
+
+    </nav>
+
+</header>
+
+
+<main class="create-poll-container">
+
+    <section class="hero">
+
+        <h1>📊 Create a Poll</h1>
+
+        <p>
+            Ask your fellow First Years a question
+            and let everyone vote.
+        </p>
+
+    </section>
+
+
+    {% if error %}
+
+        <div class="error-message">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <label for="question">
+            Your Question
+        </label>
+
+        <textarea
+            id="question"
+            name="question"
+            rows="4"
+            maxlength="300"
+            placeholder="What do you think about...?"
+            required
+        ></textarea>
+
+
+        <label>
+            Poll Options
+        </label>
+
+        <input
+            type="text"
+            name="option1"
+            maxlength="200"
+            placeholder="Option 1"
+            required
+        >
+
+        <input
+            type="text"
+            name="option2"
+            maxlength="200"
+            placeholder="Option 2"
+            required
+        >
+
+        <input
+            type="text"
+            name="option3"
+            maxlength="200"
+            placeholder="Option 3 (optional)"
+        >
+
+        <input
+            type="text"
+            name="option4"
+            maxlength="200"
+            placeholder="Option 4 (optional)"
+        >
+
+        <input
+            type="text"
+            name="option5"
+            maxlength="200"
+            placeholder="Option 5 (optional)"
+        >
+
+
+        <button
+            type="submit"
+            class="nav-post"
+        >
+            📊 Create Poll
+        </button>
+
+    </form>
+
+</main>
+
+</body>
+
+</html>

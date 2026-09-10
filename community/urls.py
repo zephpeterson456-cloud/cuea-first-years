@@ -67,3 +67,26 @@ urlpatterns.append(
         name="save_push_subscription",
     )
 )
+
+
+urlpatterns += [
+    path(
+        "poll/create/",
+        views.create_poll,
+        name="create_poll",
+    ),
+]
+
+
+urlpatterns += [
+    path(
+        "polls/",
+        views.polls,
+        name="polls",
+    ),
+    path(
+        "polls/<int:poll_id>/vote/",
+        views.vote_poll,
+        name="vote_poll",
+    ),
+]
