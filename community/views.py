@@ -9,6 +9,12 @@ from .models import Post, Notification, PushSubscription, Poll, PollOption, Poll
 
 
 def home(request):
+    if not request.user.is_authenticated:
+        return render(
+            request,
+            "community/landing.html",
+        )
+
     posts = Post.objects.filter(
         approved=True
     ).select_related("author")
@@ -466,7 +472,7 @@ def create_poll(request):
         poll = Poll.objects.create(
             question=question,
             author=request.user,
-            approved=False,
+            approved=True,
         )
 
         for option_text in options:
@@ -475,7 +481,7 @@ def create_poll(request):
                 text=option_text,
             )
 
-        return redirect("home")
+        return redirect("polls")
 
     return render(
         request,
