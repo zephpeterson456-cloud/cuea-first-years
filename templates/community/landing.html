@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CUEA First Years Hub</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4">
 </head>
 
 <body>
@@ -21,83 +21,129 @@
 
 <main>
 
-    <section class="hero landing-hero">
-        <h1>🎓 Welcome to the CUEA First Years Hub</h1>
+    <!-- HERO -->
+    <section class="landing-hero">
+        <p>🎓 CUEA FIRST YEARS COMMUNITY</p>
 
-        <p>
-            Your campus. Your people. Your space.
-        </p>
+        <h1>
+            Your Campus.<br>
+            Your People.<br>
+            <strong>Your Space.</strong>
+        </h1>
 
         <p>
             Connect with fellow First Years, share your campus moments,
-            laugh together, stay motivated and have your voice heard.
+            discover what's happening and make your university experience
+            unforgettable.
         </p>
 
         <div class="landing-actions">
-            <a href="/register/" class="nav-post">🚀 Create Your Account</a>
-            <a href="/login/">🔐 Already a member? Login</a>
+            <a href="/register/" class="nav-post">
+                🚀 Create Your Account
+            </a>
+
+            <a href="/login/">
+                🔐 Login
+            </a>
+        </div>
+
+        <small>
+            🔒 Sign up to access the community
+        </small>
+    </section>
+
+
+    <!-- FEATURES -->
+    <section class="landing-features">
+
+        <h2>🔥 What's Inside the Hub?</h2>
+
+        <p class="landing-section-intro">
+            Everything you need to connect, express yourself and enjoy
+            First Year life with your fellow students.
+        </p>
+
+        <div class="landing-feature-grid">
+
+            <div class="landing-feature-card">
+                <div class="feature-icon">😂</div>
+                <h3>Campus Memes</h3>
+                <p>
+                    Laugh, share jokes and post the funniest moments
+                    from First Year life.
+                </p>
+            </div>
+
+            <div class="landing-feature-card">
+                <div class="feature-icon">💭</div>
+                <h3>Motivation</h3>
+                <p>
+                    Discover inspiring quotes, encouragement and
+                    experiences from fellow students.
+                </p>
+            </div>
+
+            <div class="landing-feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Community Polls</h3>
+                <p>
+                    Ask questions, vote and find out what your
+                    fellow First Years think.
+                </p>
+            </div>
+
+            <div class="landing-feature-card">
+                <div class="feature-icon">❤️</div>
+                <h3>Likes & Comments</h3>
+                <p>
+                    React to posts and join conversations happening
+                    across the community.
+                </p>
+            </div>
+
+            <div class="landing-feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Follow Your People</h3>
+                <p>
+                    Follow students you connect with and keep up
+                    with their posts.
+                </p>
+            </div>
+
+            <div class="landing-feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3>Notifications</h3>
+                <p>
+                    Stay updated when people interact with your
+                    posts and profile.
+                </p>
+            </div>
+
         </div>
     </section>
 
 
-    <section class="motivation-card">
-        <h2>🔥 What's waiting inside?</h2>
+    <!-- CTA -->
+    <section class="landing-cta">
 
-        <div>
-            <h3>😂 Campus Memes</h3>
-            <p>
-                Share the funniest moments, jokes and memes from First Year life.
-            </p>
-        </div>
+        <h2>🚀 Don't Just Watch Campus Life.</h2>
 
-        <div>
-            <h3>💭 Motivation & Inspiration</h3>
-            <p>
-                Share quotes, encouragement and experiences that keep us moving.
-            </p>
-        </div>
-
-        <div>
-            <h3>📊 Community Polls</h3>
-            <p>
-                Ask questions, vote and discover what your fellow First Years think.
-            </p>
-        </div>
-
-        <div>
-            <h3>❤️ Likes & Comments</h3>
-            <p>
-                React to posts, join conversations and make your voice heard.
-            </p>
-        </div>
-
-        <div>
-            <h3>👥 Follow Your People</h3>
-            <p>
-                Follow fellow students and keep up with the people you connect with.
-            </p>
-        </div>
-
-        <div>
-            <h3>🔔 Notifications</h3>
-            <p>
-                Stay updated when people interact with your posts and profile.
-            </p>
-        </div>
-    </section>
-
-
-    <section class="join-section">
-        <h2>🚀 Don't Just Watch Campus Life — Be Part of It.</h2>
+        <h3>Be Part of It.</h3>
 
         <p>
-            The Hub is for First Years who want to connect, share,
-            laugh, learn and create memories together.
+            Join other CUEA First Years, share your voice,
+            make connections and create memories together.
         </p>
 
         <a href="/register/" class="nav-post">
             🎓 Join the First Years Hub
         </a>
+
+        <p>
+            Already have an account?
+            <a href="/login/">Login here</a>
+        </p>
+
     </section>
 
 </main>
